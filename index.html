@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MANZGAME - Premium Video Content</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- DYNAMIC ISLAND NOTIFICATION -->
+    <div id="dynamic-island" class="island-hidden">
+        <span id="island-text">Maaf Link Sudah Expired</span>
+    </div>
+
+    <!-- GLOBAL PASSWORD POPUP -->
+    <div id="global-popup" class="popup-overlay active">
+        <div class="popup-box glass-panel">
+            <div class="popup-header">
+                <h2>MASUKKAN PASSWORD</h2>
+                <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+            <p class="popup-desc">Jika saat klik Verifikasi muncul iklan, langsung kembali aja ya.</p>
+            <div class="input-group">
+                <input type="password" id="global-password" placeholder="Masukkan password awal">
+                <button class="toggle-eye" onclick="togglePassword('global-password', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+            <p id="global-error" class="error-msg"></p>
+            <button id="btn-verify-global" class="glass-btn btn-blue">Verifikasi</button>
+        </div>
+    </div>
+
+    <!-- VIDEO PASSWORD POPUP -->
+    <div id="video-popup" class="popup-overlay">
+        <div class="popup-box glass-panel">
+            <h2 id="video-popup-title" class="truncate">Judul Video</h2>
+            <div class="input-group">
+                <input type="password" id="video-password" placeholder="Password Video">
+                <button class="toggle-eye" onclick="togglePassword('video-password', this)">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                </button>
+            </div>
+            <p id="video-error" class="error-msg"></p>
+            <div class="popup-actions">
+                <button id="btn-verify-video" class="glass-btn btn-blue">Verifikasi</button>
+                <button id="btn-lihat-password" class="glass-btn btn-outline">Lihat Password</button>
+            </div>
+            <button class="close-popup" onclick="closeVideoPopup()">Kembali</button>
+        </div>
+    </div>
+
+    <!-- MAIN APP WRAPPER (BLURRED INITIALLY) -->
+    <div id="app-wrapper" class="blurred">
+        
+        <!-- HEADER -->
+        <header id="main-header" class="glass-panel">
+            <div class="header-left">
+                <img src="https://res.cloudinary.com/dfechxl6d/image/upload/v1772834121/IMG_20260208_113206_559_jglgvv.jpg" alt="Logo" class="logo">
+                <h1 id="header-title">MANZGAME</h1>
+            </div>
+            
+            <div class="header-right">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Cari video...">
+                    <button id="btn-clear-search" class="icon-btn hidden" onclick="clearSearch()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                    </button>
+                    <button id="btn-search" class="icon-btn" onclick="toggleSearch()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+                    </button>
+                </div>
+                <button class="theme-toggle icon-btn" onclick="toggleTheme()" title="Toggle Theme">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                </button>
+            </div>
+        </header>
+
+        <!-- FLOATING MAXIMIZE BUTTON -->
+        <button id="btn-perbesar" class="glass-btn hidden" onclick="toggleInfoBox()">Perbesar Informasi</button>
+
+        <!-- INFO BOX -->
+        <div id="info-box" class="glass-panel info-box">
+            <p><strong>LITERASI!</strong> : Password masih diperlukan untuk membuka link video dari tombol Password. Sedangkan tombol No Password tidak memerlukan password sama sekali. Tonton video YouTube terlebih dahulu sebelum membuka video di sini. Jika muncul iklan, langsung kembali saja lalu klik ulang tombolnya.</p>
+            <button id="btn-perkecil" class="text-btn" onclick="toggleInfoBox()">Perkecil</button>
+        </div>
+
+        <!-- MAIN CONTENT -->
+        <main class="content-area">
+            <div class="content-header">
+                <h2>KONTEN</h2>
+                <div class="layout-toggles">
+                    <button id="layout-1-col" class="icon-btn active" onclick="setLayout(1)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="5" rx="1"/><rect x="4" y="14" width="16" height="5" rx="1"/></svg>
+                    </button>
+                    <button id="layout-2-col" class="icon-btn" onclick="setLayout(2)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    </button>
+                </div>
+            </div>
+
+            <div id="video-grid" class="video-grid layout-1">
+                <!-- Cards injected via JS -->
+            </div>
+
+            <!-- PAGINATION -->
+            <div id="pagination" class="pagination glass-panel">
+                <!-- Pagination injected via JS -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="firebase.js"></script>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
