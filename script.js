@@ -17,7 +17,6 @@ const elPagination = document.getElementById('pagination');
 const elSearchInput = document.getElementById('search-input');
 const elSearchContainer = document.querySelector('.search-container');
 const elHeaderTitle = document.getElementById('header-title');
-const elBtnClearSearch = document.getElementById('btn-clear-search');
 const elIsland = document.getElementById('dynamic-island');
 const elMainHeader = document.getElementById('main-header');
 
@@ -31,10 +30,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     allVideos = await getVideos();
     filteredVideos = [...allVideos];
     
-    // Bind global events
-    document.getElementById('btn-verify-global').addEventListener('click', verifyGlobalPassword);
-    document.getElementById('btn-verify-video').addEventListener('click', verifyVideoPassword);
+    // Bind global events (Menggunakan onclick langsung mencegah bug klik ganda)
+    document.getElementById('btn-verify-global').onclick = verifyGlobalPassword;
     document.getElementById('search-input').addEventListener('input', handleSearch);
+
+    // Cek Akses Memori LocalStorage (1 Jam)
+    const accessStr = localStorage.getItem('manzgame_access');
+    let hasAccess = false;
+    
+    if (accessStr) {
+        try {
+            const access = JSON.parse(accessStr);
+            if (Date.now() < access.expiresAt) {
+                hasAccess = true;
+            } else {
+                localStorage.removeItem('manzgame_access'); // Expired
+            }
+        } catch(e) {}
+    }
+
+    if (hasAccess) {
+        elAppWrapper.classList.remove('blurred');
+        renderGrid();
+    } else {
+        // Memicu animasi smooth entrance setelah DOM dimuat
+        requestAnimationFrame(() => {
+            elGlobalPopup.classList.add('active');
+        });
+    }
 });
 
 // --- THEME ---
@@ -72,10 +95,7 @@ function animateDots(btnElement, baseText, seconds, finalBtnText, onComplete) {
         clearInterval(interval);
         btnElement.innerText = finalBtnText;
         btnElement.disabled = false;
-        
-        // Remove previous onclick events and set new one
-        btnElement.onclick = null; 
-        btnElement.addEventListener('click', onComplete, { once: true });
+        btnElement.onclick = onComplete; // Menerapkan listener bersih setelah selesai
     }, seconds * 1000);
 }
 
@@ -86,7 +106,8 @@ function verifyGlobalPassword() {
     const btn = document.getElementById('btn-verify-global');
 
     if (input !== 'qwert67') {
-        errorEl.innerText = "Password salah. Silakan coba lagi.";
+        showDynamicIsland("PASSWORD SALAH!");
+        errorEl.innerText = ""; // Clear inline error karena memakai Dynamic Island
         return;
     }
     
@@ -96,10 +117,15 @@ function verifyGlobalPassword() {
     
     // 2. Animasi Loading 10 Detik
     animateDots(btn, "Menyiapkan", 10, "Berikutnya", () => {
-        // 3. Buka Akses Web
+        // Simpan status sukses ke localStorage selama 1 jam
+        const expiresAt = Date.now() + (60 * 60 * 1000);
+        localStorage.setItem('manzgame_access', JSON.stringify({ granted: true, expiresAt }));
+
+        // 3. Buka Akses Web dengan Smooth Exit Animation
         elGlobalPopup.classList.add('slide-down');
         setTimeout(() => {
             elGlobalPopup.classList.remove('active');
+            elGlobalPopup.classList.remove('slide-down');
             elAppWrapper.classList.remove('blurred');
             renderGrid();
         }, 500);
@@ -214,17 +240,17 @@ window.handlePasswordBtn = (id, isExpired, btnElement) => {
         void btnElement.offsetWidth; // trigger reflow
         btnElement.classList.add('shake');
         
-        showDynamicIsland();
+        showDynamicIsland("Maaf Link Sudah Expired");
     } else {
         selectedVideo = allVideos.find(v => v.id === id);
         document.getElementById('video-popup-title').innerText = selectedVideo.title;
         document.getElementById('video-password').value = '';
         document.getElementById('video-error').innerText = '';
         
-        // Reset button verify state
+        // Reset button verify state (Menghindari event bertumpuk)
         const btnVerify = document.getElementById('btn-verify-video');
         btnVerify.innerText = 'Verifikasi';
-        btnVerify.onclick = verifyVideoPassword;
+        btnVerify.onclick = verifyVideoPassword; 
         
         document.getElementById('btn-lihat-password').onclick = () => {
             window.open(selectedVideo.youtubePasswordLink, '_blank');
@@ -254,7 +280,7 @@ function verifyVideoPassword() {
             errorEl.innerText = "Password video salah. Silakan cek ulang.";
             // Reset button to verify again
             btn.innerText = 'Verifikasi';
-            btn.addEventListener('click', verifyVideoPassword, { once: true });
+            btn.onclick = verifyVideoPassword;
         }
     });
 }
@@ -264,10 +290,11 @@ window.closeVideoPopup = () => {
 };
 
 // --- DYNAMIC ISLAND LOGIC ---
-function showDynamicIsland() {
+function showDynamicIsland(message = "Maaf Link Sudah Expired") {
     if (isIslandActive) return; // Ignore spam clicks
     isIslandActive = true;
     
+    document.getElementById('island-text').innerText = message;
     elMainHeader.classList.add('header-dimmed');
     elIsland.classList.remove('island-hidden');
     
