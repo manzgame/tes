@@ -67,7 +67,8 @@
             <div class="header-right">
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="Cari video...">
-                    <button id="btn-clear-search" class="icon-btn hidden" onclick="clearSearch()">
+                    <!-- Dihilangkan class 'hidden' di tombol X, visibilitas diatur otomatis via CSS -->
+                    <button id="btn-clear-search" class="icon-btn" onclick="clearSearch()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>
                     <button id="btn-search" class="icon-btn" onclick="toggleSearch()">
@@ -120,3 +121,5 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
+
+
