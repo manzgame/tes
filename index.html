@@ -14,15 +14,17 @@
     </div>
 
     <!-- GLOBAL PASSWORD POPUP -->
-    <div id="global-popup" class="popup-overlay active">
+    <!-- Class 'active' dihilangkan dari awal agar animasi entrance berjalan mulus saat JS memuatnya -->
+    <div id="global-popup" class="popup-overlay">
         <div class="popup-box glass-panel">
-            <div class="popup-header">
-                <h2>MASUKKAN PASSWORD</h2>
+            <div class="popup-brand-row">
+                <span class="brand-text">MANZGAME</span>
                 <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Theme">
                     <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
                     <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                 </button>
             </div>
+            <h2 class="popup-title">MASUKKAN PASSWORD</h2>
             <p class="popup-desc">Jika saat klik Verifikasi muncul iklan, langsung kembali aja ya.</p>
             <div class="input-group">
                 <input type="password" id="global-password" placeholder="Masukkan password awal">
@@ -38,7 +40,7 @@
     <!-- VIDEO PASSWORD POPUP -->
     <div id="video-popup" class="popup-overlay">
         <div class="popup-box glass-panel">
-            <h2 id="video-popup-title" class="truncate">Judul Video</h2>
+            <h2 id="video-popup-title" class="truncate popup-title">Judul Video</h2>
             <div class="input-group">
                 <input type="password" id="video-password" placeholder="Password Video">
                 <button class="toggle-eye" onclick="togglePassword('video-password', this)">
@@ -67,7 +69,6 @@
             <div class="header-right">
                 <div class="search-container">
                     <input type="text" id="search-input" placeholder="Cari video...">
-                    <!-- Dihilangkan class 'hidden' di tombol X, visibilitas diatur otomatis via CSS -->
                     <button id="btn-clear-search" class="icon-btn" onclick="clearSearch()">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
                     </button>
