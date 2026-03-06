@@ -71,12 +71,12 @@ body {
     display: inline-flex;
     justify-content: center;
     align-items: center;
-    color: var(--text-main); /* Adaptif ke tema */
+    color: var(--text-main);
 }
 .glass-btn:active { transform: scale(0.96); }
-.btn-blue { background: var(--accent-blue); color: #fff; } /* Override putih mutlak */
+.btn-blue { background: var(--accent-blue); color: #fff; }
 .btn-blue:hover { background: var(--accent-blue-hover); box-shadow: 0 4px 15px rgba(10, 132, 255, 0.4); }
-.btn-green { background: var(--accent-green); color: #fff; } /* Override putih mutlak */
+.btn-green { background: var(--accent-green); color: #fff; }
 .btn-green:hover { background: var(--accent-green-hover); box-shadow: 0 4px 15px rgba(48, 209, 88, 0.4); }
 .btn-outline { background: transparent; border: 1px solid var(--glass-border); color: var(--text-main); }
 .btn-outline:hover { background: rgba(128,128,128,0.1); }
@@ -101,7 +101,6 @@ body {
 #app-wrapper.blurred {
     filter: blur(15px); pointer-events: none; user-select: none;
 }
-/* Efek saat dynamic island muncul (bukan hitam, melainkan blur halus) */
 .header-dimmed {
     filter: blur(4px) opacity(0.7);
     transition: all 0.3s ease;
@@ -111,41 +110,61 @@ body {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: var(--overlay-bg); backdrop-filter: blur(5px);
     display: flex; justify-content: center; align-items: center;
-    z-index: 9999; opacity: 0; pointer-events: none;
-    transition: opacity 0.4s ease;
+    z-index: 9999; 
+    opacity: 0; 
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
 }
-.popup-overlay.active { opacity: 1; pointer-events: all; }
+.popup-overlay.active { 
+    opacity: 1; 
+    visibility: visible; 
+    pointer-events: all; 
+}
 
 .popup-box {
     width: 90%; max-width: 400px; padding: 25px; border-radius: 24px;
-    text-align: center; transform: translateY(30px);
-    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-.popup-overlay.active .popup-box { transform: translateY(0); }
-.popup-overlay.slide-down .popup-box { transform: translateY(100vh); opacity: 0; }
-
-/* REVISI: Tata letak Header Popup yang disempurnakan */
-.popup-header { 
-    position: relative; 
-    display: flex; 
-    justify-content: center; 
-    align-items: center; 
-    margin-bottom: 12px; 
-}
-.popup-header h2 { 
-    font-size: 18px; 
-    font-weight: 700; 
-    letter-spacing: 0.5px; 
     text-align: center; 
-    width: 100%; 
+    transform: translateY(40px) scale(0.98);
+    opacity: 0;
+    transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.5s ease;
 }
-.popup-header .theme-toggle {
-    position: absolute;
-    top: -5px;
-    right: -5px;
+.popup-overlay.active .popup-box { 
+    transform: translateY(0) scale(1); 
+    opacity: 1;
+}
+.popup-overlay.slide-down .popup-box { 
+    transform: translateY(60px) scale(0.95); 
+    opacity: 0; 
 }
 
-.popup-desc { font-size: 14px; color: var(--text-sub); margin-bottom: 16px; line-height: 1.4; }
+/* Popup Brand Row (Top Header) */
+.popup-brand-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+.brand-text {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: var(--text-sub);
+}
+.popup-brand-row .theme-toggle {
+    position: relative;
+}
+
+.popup-title {
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 0.5px;
+    width: 100%;
+}
+.popup-desc { 
+    font-size: 14px; color: var(--text-sub); margin-bottom: 12px; line-height: 1.4; 
+}
 
 .input-group { position: relative; margin-bottom: 12px; }
 .input-group input {
@@ -160,12 +179,14 @@ body {
 }
 .toggle-eye svg { width: 20px; height: 20px; }
 
-.error-msg { color: var(--error-color); font-size: 13px; min-height: 20px; margin-bottom: 8px; }
+.error-msg { color: var(--error-color); font-size: 13px; min-height: 0; margin-bottom: 0; display: none; }
+.error-msg:not(:empty) { display: block; margin-bottom: 12px; }
+
 .popup-box .glass-btn { width: 100%; }
-.popup-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px;}
+.popup-actions { display: flex; flex-direction: column; gap: 10px; margin-bottom: 10px;}
 .close-popup { background: none; border: none; color: var(--text-sub); font-size: 14px; cursor: pointer; margin-top: 10px;}
 .close-popup:hover { color: var(--text-main); }
-.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 20px; }
+.truncate { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 15px; }
 
 /* =========================================
    HEADER & SEARCH
@@ -183,7 +204,7 @@ header {
 .header-right { display: flex; align-items: center; gap: 10px; }
 .search-container { position: relative; display: flex; align-items: center; }
 
-/* Animasi Search Bar & Tombol Clear X */
+/* Animasi Search Bar */
 #search-input {
     position: absolute; right: 40px; width: 0; opacity: 0;
     background: rgba(128, 128, 128, 0.1); border: 1px solid var(--glass-border);
@@ -205,8 +226,6 @@ header {
     .search-active #btn-clear-search { right: 165px; }
 }
 
-.hidden { display: none !important; }
-
 /* THEME TOGGLE ANIMATION */
 .theme-toggle { position: relative; width: 36px; height: 36px; overflow: hidden; background: transparent; border: none; cursor: pointer; color: var(--text-main);}
 .sun-icon, .moon-icon { position: absolute; top: 7px; left: 7px; transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -219,7 +238,8 @@ header {
    INFO BOX & DYNAMIC ISLAND
 ========================================= */
 .info-box {
-    margin: 15px 5%; padding: 15px 20px; border-radius: 16px;
+    margin: 15px 5% 5px 5%;
+    padding: 15px 20px; border-radius: 16px;
     position: relative; overflow: hidden;
     transition: max-height 0.5s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.4s, margin 0.5s;
     max-height: 200px; opacity: 1;
@@ -229,9 +249,8 @@ header {
 .info-box strong { color: var(--text-main); }
 .text-btn { background: none; border: none; color: var(--accent-blue); font-size: 13px; font-weight: 600; cursor: pointer; position: absolute; bottom: 12px; right: 15px; }
 
-/* REVISI: Tombol Perbesar Tema */
 #btn-perbesar { 
-    margin: 10px 5%; padding: 10px 20px; font-size: 13px; border-radius: 12px;
+    margin: 10px 5% 5px 5%; padding: 10px 20px; font-size: 13px; border-radius: 12px;
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
@@ -239,7 +258,7 @@ header {
 }
 #btn-perbesar:hover { background: rgba(128,128,128,0.15); }
 
-/* REVISI: DYNAMIC ISLAND LIQUID GLASS */
+/* DYNAMIC ISLAND LIQUID GLASS */
 #dynamic-island {
     position: fixed; top: 10px; left: 50%; transform: translateX(-50%);
     background: var(--glass-bg);
@@ -257,26 +276,24 @@ header {
 #dynamic-island.island-expanded { width: 280px; height: 45px; opacity: 1; top: 15px; }
 #island-text { opacity: 0; white-space: nowrap; transition: opacity 0.3s 0.2s; }
 #dynamic-island.island-expanded #island-text { opacity: 1; }
+.hidden { display: none !important; }
 
 /* =========================================
    CONTENT AREA & GRID
 ========================================= */
-.content-area { padding: 20px 5%; max-width: 1200px; margin: 0 auto; }
+.content-area { padding: 10px 5% 20px 5%; max-width: 1200px; margin: 0 auto; }
 .content-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .content-header h2 { font-size: 18px; font-weight: 700; letter-spacing: 1px; }
 .layout-toggles { display: flex; gap: 8px; background: rgba(128,128,128,0.1); padding: 5px; border-radius: 16px; }
 
-/* REVISI: Sistem Grid yang 100% Berfungsi hingga ke Mobile */
 .video-grid { display: grid; gap: 20px; transition: all 0.5s; width: 100%; }
 .video-grid.layout-1 { grid-template-columns: 1fr; }
 .video-grid.layout-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
-/* Agar dua kolom tetap presisi meski di layar HP yang sempit */
 @media(max-width: 500px) { 
     .video-grid.layout-2 { gap: 10px; }
     .video-grid.layout-2 .card { padding: 10px; gap: 8px; }
     .video-grid.layout-2 .card-title { font-size: 13px; -webkit-line-clamp: 3; }
-    /* Pada layout 2-kolom mobile, tombol vertikal agar ruang terpakai dengan baik */
     .video-grid.layout-2 .card-actions { display: flex; flex-direction: column; gap: 6px; } 
     .video-grid.layout-2 .glass-btn { font-size: 12px; padding: 8px 10px; width: 100%; }
     .video-grid.layout-2 .badge-expired { font-size: 9px; padding: 3px 6px; }
