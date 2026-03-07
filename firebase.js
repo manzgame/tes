@@ -20,28 +20,20 @@ try {
     console.error("Firebase Initialization Error:", error);
 }
 
-// Data Fallback (Hanya dipakai jika Firestore benar-benar kosong/error jaringan)
-const fallbackVideos = [];
-const today = new Date();
-for (let i = 1; i <= 3; i++) {
-    let uploadDate = new Date(today);
-    uploadDate.setDate(today.getDate() - (i % 3)); 
-    let expiryDate = new Date(uploadDate);
-    expiryDate.setDate(expiryDate.getDate() + 7);
-
-    fallbackVideos.push({
-        id: `vid-${i}`,
-        title: `Premium Video Content Chapter ${i}`,
-        thumbnail: `https://picsum.photos/seed/${i+100}/640/360`,
-        passwordLink: `https://example.com/pw-${i}`,
-        noPasswordLink: `https://example.com/nopw-${i}`,
-        videoPassword: `rahasia${i}`,
-        youtubePasswordLink: `https://youtube.com/watch?v=ex${i}`,
-        uploadDate: uploadDate.toISOString(),
-        expiryDate: expiryDate.toISOString(),
-        isPublished: true
-    });
+// Helper: Ekstrak Tanggal Firestore yang Aman (Mencegah "NaN")
+function safeDateString(val) {
+    if (!val) return null;
+    // Jika format Firestore Timestamp
+    if (typeof val.toDate === 'function') return val.toDate().toISOString();
+    if (val.seconds) return new Date(val.seconds * 1000).toISOString();
+    // Jika format Date biasa atau String ISO
+    const d = new Date(val);
+    if (!isNaN(d.getTime())) return d.toISOString();
+    return null; // Fallback jika format hancur
 }
+
+const fallbackVideos = [];
+// (Data fallback tetap ada sebagai safety net jika db belum konek)
 
 // ----------------------------------------------------
 // PUBLIC API: Get Only Published Videos
@@ -53,16 +45,19 @@ export async function getVideos() {
         const videos = [];
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            // Hanya tampilkan yang published = true
             if (data.isPublished === true) {
-                videos.push({ id: doc.id, ...data });
+                videos.push({ 
+                    id: doc.id, 
+                    ...data,
+                    // Normalisasi saat membaca
+                    uploadDate: safeDateString(data.uploadDate),
+                    expiryDate: safeDateString(data.expiryDate)
+                });
             }
         });
         
-        // Urutkan dari yang terbaru (opsional)
         videos.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
-        
-        return videos.length > 0 ? videos : [];
+        return videos.length > 0 ? videos : fallbackVideos;
     } catch (error) {
         console.warn("Gagal mengambil Firestore, menggunakan fallback:", error.message);
         return fallbackVideos;
@@ -78,7 +73,13 @@ export async function getAllVideosForAdmin() {
         const querySnapshot = await getDocs(collection(db, "videos"));
         const videos = [];
         querySnapshot.forEach((doc) => {
-            videos.push({ id: doc.id, ...doc.data() });
+            const data = doc.data();
+            videos.push({ 
+                id: doc.id, 
+                ...data,
+                uploadDate: safeDateString(data.uploadDate),
+                expiryDate: safeDateString(data.expiryDate)
+            });
         });
         videos.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
         return videos;
