@@ -8,6 +8,10 @@ let layoutMode = 1; // 1: 1 kolom (5 item), 2: 2 kolom (10 item)
 let isIslandActive = false;
 let selectedVideo = null;
 
+// Konfigurasi Keamanan
+const ACCESS_KEY = 'manzgame_access';
+const ACCESS_DURATION = 60 * 60 * 1000; // 1 Jam
+
 // --- DOM ELEMENTS ---
 const elAppWrapper = document.getElementById('app-wrapper');
 const elGlobalPopup = document.getElementById('global-popup');
@@ -21,44 +25,111 @@ const elIsland = document.getElementById('dynamic-island');
 const elMainHeader = document.getElementById('main-header');
 
 // --- INIT ---
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. Jalankan inisialisasi state secara sinkron tanpa menunggu fetch
+    initializeAppState();
+    
+    // 2. Fetch data berjalan di background tanpa memblokir render UI
+    initData();
+});
+
+// Menangani Tab Resume / Pindah Tab Browser
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        // Jika user kembali ke tab ini dan durasi aksesnya sudah kedaluwarsa, kunci ulang instan
+        if (!hasValidAccess() && !elGlobalPopup.classList.contains('active')) {
+            applyLockedState();
+        }
+    }
+});
+
+// --- SECURITY & STATE ARCHITECTURE ---
+function getStoredAccess() {
+    try {
+        const accessStr = localStorage.getItem(ACCESS_KEY);
+        return accessStr ? JSON.parse(accessStr) : null;
+    } catch(e) {
+        return null;
+    }
+}
+
+function hasValidAccess() {
+    const access = getStoredAccess();
+    if (access && Date.now() < access.expiresAt) {
+        return true;
+    }
+    // Jika tidak valid / kedaluwarsa, pastikan memori dibersihkan
+    clearStoredAccess();
+    return false;
+}
+
+function clearStoredAccess() {
+    localStorage.removeItem(ACCESS_KEY);
+}
+
+function setStoredAccess() {
+    const expiresAt = Date.now() + ACCESS_DURATION;
+    localStorage.setItem(ACCESS_KEY, JSON.stringify({ granted: true, expiresAt }));
+}
+
+function applyLockedState() {
+    elAppWrapper.classList.add('blurred');
+    elGlobalPopup.classList.remove('slide-down');
+    
+    // RequestAnimationFrame memastikan transisi CSS ter-trigger dengan smooth
+    requestAnimationFrame(() => {
+        elGlobalPopup.classList.add('active');
+    });
+    
+    // Reset status form & tombol jika aplikasi mengunci ulang
+    const btn = document.getElementById('btn-verify-global');
+    btn.innerText = 'Verifikasi';
+    btn.onclick = verifyGlobalPassword;
+    document.getElementById('global-password').value = '';
+}
+
+function applyUnlockedState(animate = false) {
+    if (animate) {
+        elGlobalPopup.classList.add('slide-down');
+        setTimeout(() => {
+            elGlobalPopup.classList.remove('active');
+            elGlobalPopup.classList.remove('slide-down');
+            elAppWrapper.classList.remove('blurred');
+        }, 500);
+    } else {
+        // Jika akses valid via refresh, hapus langsung tanpa delay / flash
+        elGlobalPopup.classList.remove('active');
+        elGlobalPopup.classList.remove('slide-down');
+        elAppWrapper.classList.remove('blurred');
+    }
+}
+
+function initializeAppState() {
     // Load theme
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    // Fetch data
-    allVideos = await getVideos();
-    filteredVideos = [...allVideos];
-    
-    // Bind global events (Menggunakan onclick langsung mencegah bug klik ganda)
+    // Bind event statis
     document.getElementById('btn-verify-global').onclick = verifyGlobalPassword;
     document.getElementById('search-input').addEventListener('input', handleSearch);
 
-    // Cek Akses Memori LocalStorage (1 Jam)
-    const accessStr = localStorage.getItem('manzgame_access');
-    let hasAccess = false;
-    
-    if (accessStr) {
-        try {
-            const access = JSON.parse(accessStr);
-            if (Date.now() < access.expiresAt) {
-                hasAccess = true;
-            } else {
-                localStorage.removeItem('manzgame_access'); // Expired
-            }
-        } catch(e) {}
-    }
-
-    if (hasAccess) {
-        elAppWrapper.classList.remove('blurred');
-        renderGrid();
+    // Penentuan Layout Keamanan Utama (Sinkron)
+    if (hasValidAccess()) {
+        applyUnlockedState(false);
     } else {
-        // Memicu animasi smooth entrance setelah DOM dimuat
-        requestAnimationFrame(() => {
-            elGlobalPopup.classList.add('active');
-        });
+        applyLockedState();
     }
-});
+}
+
+async function initData() {
+    allVideos = await getVideos();
+    filteredVideos = [...allVideos];
+    
+    // Hanya re-render konten jika state web sedang tidak dikunci
+    if (hasValidAccess()) {
+        renderGrid();
+    }
+}
 
 // --- THEME ---
 window.toggleTheme = () => {
@@ -95,7 +166,7 @@ function animateDots(btnElement, baseText, seconds, finalBtnText, onComplete) {
         clearInterval(interval);
         btnElement.innerText = finalBtnText;
         btnElement.disabled = false;
-        btnElement.onclick = onComplete; // Menerapkan listener bersih setelah selesai
+        btnElement.onclick = onComplete; // Menerapkan listener bersih setelah timer selesai
     }, seconds * 1000);
 }
 
@@ -107,7 +178,7 @@ function verifyGlobalPassword() {
 
     if (input !== 'qwert67') {
         showDynamicIsland("PASSWORD SALAH!");
-        errorEl.innerText = ""; // Clear inline error karena memakai Dynamic Island
+        errorEl.innerText = ""; 
         return;
     }
     
@@ -117,18 +188,14 @@ function verifyGlobalPassword() {
     
     // 2. Animasi Loading 10 Detik
     animateDots(btn, "Menyiapkan", 10, "Berikutnya", () => {
-        // Simpan status sukses ke localStorage selama 1 jam
-        const expiresAt = Date.now() + (60 * 60 * 1000);
-        localStorage.setItem('manzgame_access', JSON.stringify({ granted: true, expiresAt }));
-
-        // 3. Buka Akses Web dengan Smooth Exit Animation
-        elGlobalPopup.classList.add('slide-down');
-        setTimeout(() => {
-            elGlobalPopup.classList.remove('active');
-            elGlobalPopup.classList.remove('slide-down');
-            elAppWrapper.classList.remove('blurred');
+        // Akses diberikan secara resmi hanya setelah tombol "Berikutnya" diklik
+        setStoredAccess();
+        applyUnlockedState(true);
+        
+        // Memastikan grid me-render data jika background fetch sudah selesai
+        if (allVideos.length > 0) {
             renderGrid();
-        }, 500);
+        }
     });
 }
 
