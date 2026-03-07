@@ -69,6 +69,7 @@ function applyLockedState() {
     elAppWrapper.classList.add('blurred');
     elGlobalPopup.classList.remove('slide-down');
     requestAnimationFrame(() => elGlobalPopup.classList.add('active'));
+    document.body.classList.add('no-scroll'); // PENCEGAH SCROLL SAAT POPUP
     
     const btn = document.getElementById('btn-verify-global');
     btn.innerText = 'Verifikasi';
@@ -82,10 +83,12 @@ function applyUnlockedState(animate = false) {
         setTimeout(() => {
             elGlobalPopup.classList.remove('active', 'slide-down');
             elAppWrapper.classList.remove('blurred');
+            document.body.classList.remove('no-scroll'); // MEMBEBASKAN SCROLL SAAT POPUP TUTUP
         }, 500);
     } else {
         elGlobalPopup.classList.remove('active', 'slide-down');
         elAppWrapper.classList.remove('blurred');
+        document.body.classList.remove('no-scroll'); // MEMBEBASKAN SCROLL SAAT POPUP TUTUP
     }
 }
 
@@ -141,8 +144,15 @@ function animateDots(btnElement, baseText, seconds, finalBtnText, onComplete) {
 }
 
 window.toggleSidebar = () => {
-    document.getElementById('sidebar').classList.toggle('active');
+    const sidebarActive = document.getElementById('sidebar').classList.toggle('active');
     document.getElementById('sidebar-overlay').classList.toggle('active');
+    
+    // PENCEGAH SCROLL LOKAL SAAT SIDEBAR TERBUKA
+    if (sidebarActive) {
+        document.body.classList.add('no-scroll');
+    } else {
+        document.body.classList.remove('no-scroll');
+    }
 };
 
 window.navHome = () => {
@@ -151,13 +161,15 @@ window.navHome = () => {
 };
 
 window.openAdminPopup = () => {
-    window.toggleSidebar();
+    window.toggleSidebar(); // Menutup sidebar otomatis yang meniadakan no-scroll
     document.getElementById('admin-password').value = '';
     document.getElementById('admin-popup').classList.add('active');
+    document.body.classList.add('no-scroll'); // Pasang kembali no-scroll untuk popup admin
 };
 
 window.closeAdminPopup = () => {
     document.getElementById('admin-popup').classList.remove('active');
+    document.body.classList.remove('no-scroll'); // Membebaskan scroll layar
 };
 
 window.verifyAdminPassword = () => {
@@ -259,17 +271,15 @@ function renderGrid() {
     const now = new Date();
 
     pageVideos.forEach(video => {
-        // PERBAIKAN LOGIKA EXPIRY: Anti-NaN Fail-Safe
         let expiryDate = null;
         if (video.expiryDate) {
             expiryDate = new Date(video.expiryDate);
         }
         
-        // Fallback jika expiryDate tidak valid/kosong
         if (!expiryDate || isNaN(expiryDate.getTime())) {
             const uploadDate = video.uploadDate ? new Date(video.uploadDate) : now;
             expiryDate = new Date(uploadDate);
-            if(isNaN(expiryDate.getTime())) expiryDate = new Date(now); // Deep safety
+            if(isNaN(expiryDate.getTime())) expiryDate = new Date(now); 
             expiryDate.setDate(expiryDate.getDate() + 7);
         }
 
@@ -281,7 +291,6 @@ function renderGrid() {
         if (isExpired) {
             badgeHtml = `<div class="badge-expired danger">Expired! harap pakai link no password dulu</div>`;
         } else if (isNaN(daysLeft)) {
-            // Jika suatu saat sistem anomali, tidak keluar kata NaN
             badgeHtml = `<div class="badge-expired danger">Link Tersedia</div>`;
         } else {
             badgeHtml = `<div class="badge-expired">Expired ${daysLeft} hari lagi...</div>`;
@@ -326,6 +335,7 @@ window.handlePasswordBtn = (id, isExpired, btnElement) => {
         };
 
         elVideoPopup.classList.add('active');
+        document.body.classList.add('no-scroll'); // PENCEGAH SCROLL SAAT POPUP
     }
 };
 
@@ -352,6 +362,7 @@ function verifyVideoPassword() {
 
 window.closeVideoPopup = () => {
     elVideoPopup.classList.remove('active');
+    document.body.classList.remove('no-scroll'); // MEMBEBASKAN SCROLL SAAT POPUP TUTUP
 };
 
 function showDynamicIsland(message = "Maaf Link Sudah Expired") {
