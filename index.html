@@ -4,6 +4,22 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MANZGAME - Premium Video Content</title>
+    
+    <!-- Import Quicksand Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Render-Blocking Theme Initialization -->
+    <script>
+        let initTheme = localStorage.getItem('theme');
+        if (!initTheme) {
+            initTheme = 'dark';
+            localStorage.setItem('theme', 'dark');
+        }
+        document.documentElement.setAttribute('data-theme', initTheme);
+    </script>
+
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -39,7 +55,7 @@
             <div class="total-videos">Total Video: <span id="total-video-count">0</span></div>
             <button class="glass-btn btn-outline" style="width: 100%;" onclick="openAdminPopup()">
                 <svg style="margin-right: 8px; width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                Admin
+                Akses Admin Khusus
             </button>
         </div>
     </aside>
@@ -168,5 +184,4 @@
     <script type="module" src="script.js"></script>
 </body>
 </html>
-
 
