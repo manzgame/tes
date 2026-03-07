@@ -8,7 +8,11 @@ const elAdminPopup = document.getElementById('admin-popup');
 
 // Cek Keamanan Berjenjang (Publik -> Admin)
 document.addEventListener('DOMContentLoaded', () => {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
+    let savedTheme = localStorage.getItem('theme');
+    if (!savedTheme) {
+        savedTheme = 'dark';
+        localStorage.setItem('theme', 'dark');
+    }
     document.documentElement.setAttribute('data-theme', savedTheme);
 
     if (!hasValidPublicAccess()) {
