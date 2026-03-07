@@ -1,25 +1,21 @@
 import { getVideos } from './firebase.js';
 
-// --- KONFIGURASI LINK EKSTERNAL ---
 window.SOCIAL_LINKS = {
     youtube: "https://youtube.com/@contoh",
     whatsapp: "https://whatsapp.com/channel/contoh",
     telegram: "https://t.me/contoh"
 };
 
-// --- STATE ---
 let allVideos = [];
 let filteredVideos = [];
 let currentPage = 1;
-let layoutMode = 1; // 1: 1 kolom (5 item), 2: 2 kolom (10 item)
+let layoutMode = 1; 
 let isIslandActive = false;
 let selectedVideo = null;
 
-// Konfigurasi Keamanan
 const ACCESS_KEY = 'manzgame_access';
-const ACCESS_DURATION = 60 * 60 * 1000; // 1 Jam
+const ACCESS_DURATION = 60 * 60 * 1000; 
 
-// --- DOM ELEMENTS ---
 const elAppWrapper = document.getElementById('app-wrapper');
 const elGlobalPopup = document.getElementById('global-popup');
 const elVideoPopup = document.getElementById('video-popup');
@@ -31,13 +27,11 @@ const elHeaderTitle = document.getElementById('header-title');
 const elIsland = document.getElementById('dynamic-island');
 const elMainHeader = document.getElementById('main-header');
 
-// --- INIT ---
 document.addEventListener('DOMContentLoaded', () => {
     initializeAppState();
     initData();
 });
 
-// Menangani Tab Resume / Pindah Tab Browser
 document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible') {
         if (!hasValidAccess() && !elGlobalPopup.classList.contains('active')) {
@@ -46,7 +40,6 @@ document.addEventListener('visibilitychange', () => {
     }
 });
 
-// --- SECURITY & STATE ARCHITECTURE ---
 function getStoredAccess() {
     try {
         const accessStr = localStorage.getItem(ACCESS_KEY);
@@ -58,9 +51,7 @@ function getStoredAccess() {
 
 function hasValidAccess() {
     const access = getStoredAccess();
-    if (access && Date.now() < access.expiresAt) {
-        return true;
-    }
+    if (access && Date.now() < access.expiresAt) return true;
     clearStoredAccess();
     return false;
 }
@@ -77,10 +68,7 @@ function setStoredAccess() {
 function applyLockedState() {
     elAppWrapper.classList.add('blurred');
     elGlobalPopup.classList.remove('slide-down');
-    
-    requestAnimationFrame(() => {
-        elGlobalPopup.classList.add('active');
-    });
+    requestAnimationFrame(() => elGlobalPopup.classList.add('active'));
     
     const btn = document.getElementById('btn-verify-global');
     btn.innerText = 'Verifikasi';
@@ -92,13 +80,11 @@ function applyUnlockedState(animate = false) {
     if (animate) {
         elGlobalPopup.classList.add('slide-down');
         setTimeout(() => {
-            elGlobalPopup.classList.remove('active');
-            elGlobalPopup.classList.remove('slide-down');
+            elGlobalPopup.classList.remove('active', 'slide-down');
             elAppWrapper.classList.remove('blurred');
         }, 500);
     } else {
-        elGlobalPopup.classList.remove('active');
-        elGlobalPopup.classList.remove('slide-down');
+        elGlobalPopup.classList.remove('active', 'slide-down');
         elAppWrapper.classList.remove('blurred');
     }
 }
@@ -106,60 +92,42 @@ function applyUnlockedState(animate = false) {
 function initializeAppState() {
     const savedTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
-
     document.getElementById('btn-verify-global').onclick = verifyGlobalPassword;
     document.getElementById('search-input').addEventListener('input', handleSearch);
 
-    if (hasValidAccess()) {
-        applyUnlockedState(false);
-    } else {
-        applyLockedState();
-    }
+    if (hasValidAccess()) applyUnlockedState(false);
+    else applyLockedState();
 }
 
 async function initData() {
     allVideos = await getVideos();
     filteredVideos = [...allVideos];
-    
-    // Update Total Video Counter (Realtime Full Database Total)
     document.getElementById('total-video-count').innerText = allVideos.length;
 
-    if (hasValidAccess()) {
-        renderGrid();
-    }
+    if (hasValidAccess()) renderGrid();
 }
 
-// --- THEME ---
 window.toggleTheme = () => {
     const root = document.documentElement;
-    const current = root.getAttribute('data-theme');
-    const next = current === 'dark' ? 'light' : 'dark';
+    const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     root.setAttribute('data-theme', next);
     localStorage.setItem('theme', next);
 };
 
-// --- PASSWORD UTILS ---
 window.togglePassword = (inputId, btn) => {
     const input = document.getElementById(inputId);
-    if (input.type === "password") {
-        input.type = "text";
-        btn.style.color = "var(--accent-blue)";
-    } else {
-        input.type = "password";
-        btn.style.color = "var(--text-sub)";
-    }
+    input.type = input.type === "password" ? "text" : "password";
+    btn.style.color = input.type === "text" ? "var(--accent-blue)" : "var(--text-sub)";
 };
 
 function animateDots(btnElement, baseText, seconds, finalBtnText, onComplete) {
     let count = 0;
     btnElement.innerText = baseText;
     btnElement.disabled = true;
-    
     const interval = setInterval(() => {
         count = (count + 1) % 4;
         btnElement.innerText = baseText + ".".repeat(count);
     }, 500);
-
     setTimeout(() => {
         clearInterval(interval);
         btnElement.innerText = finalBtnText;
@@ -168,19 +136,9 @@ function animateDots(btnElement, baseText, seconds, finalBtnText, onComplete) {
     }, seconds * 1000);
 }
 
-// --- SIDEBAR MENU LOGIC ---
 window.toggleSidebar = () => {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('sidebar-overlay');
-    const isActive = sidebar.classList.contains('active');
-    
-    if (isActive) {
-        sidebar.classList.remove('active');
-        overlay.classList.remove('active');
-    } else {
-        sidebar.classList.add('active');
-        overlay.classList.add('active');
-    }
+    document.getElementById('sidebar').classList.toggle('active');
+    document.getElementById('sidebar-overlay').classList.toggle('active');
 };
 
 window.navHome = () => {
@@ -188,7 +146,6 @@ window.navHome = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-// --- ADMIN POPUP LOGIC ---
 window.openAdminPopup = () => {
     window.toggleSidebar();
     document.getElementById('admin-password').value = '';
@@ -199,21 +156,23 @@ window.closeAdminPopup = () => {
     document.getElementById('admin-popup').classList.remove('active');
 };
 
+// TERKONEKSI KE ADMIN PANEL
 window.verifyAdminPassword = () => {
     const input = document.getElementById('admin-password').value;
     const btn = document.getElementById('btn-verify-admin');
     
     if (input === 'yuhu67') {
+        // Beri tiket akses admin khusus dan pindah halaman
+        localStorage.setItem('manzgame_admin_access', 'true');
         window.location.href = 'admin.html';
     } else {
         btn.classList.remove('shake');
-        void btn.offsetWidth; // trigger reflow untuk re-animasi
+        void btn.offsetWidth; 
         btn.classList.add('shake');
         showDynamicIsland("Maaf Password Salah");
     }
 };
 
-// --- GLOBAL PASSWORD LOGIC ---
 function verifyGlobalPassword() {
     const input = document.getElementById('global-password').value;
     const btn = document.getElementById('btn-verify-global');
@@ -224,7 +183,6 @@ function verifyGlobalPassword() {
     }
     
     window.open('https://www.effectivegatecpm.com/z55w4h3qx2?key=b3e81a33d4a9ac5be6d499f5f1bd6274', '_blank');
-    
     animateDots(btn, "Menyiapkan", 10, "Berikutnya", () => {
         setStoredAccess();
         applyUnlockedState(true);
@@ -232,7 +190,6 @@ function verifyGlobalPassword() {
     });
 }
 
-// --- HEADER & SEARCH LOGIC ---
 window.toggleSearch = () => {
     const isActive = elSearchContainer.classList.contains('search-active');
     if (!isActive) {
@@ -256,7 +213,6 @@ function handleSearch() {
     renderGrid();
 }
 
-// --- INFO BOX LOGIC ---
 window.toggleInfoBox = () => {
     const box = document.getElementById('info-box');
     const btnPerbesar = document.getElementById('btn-perbesar');
@@ -270,14 +226,11 @@ window.toggleInfoBox = () => {
     }
 };
 
-// --- LAYOUT & RENDER LOGIC ---
 window.setLayout = (mode) => {
     layoutMode = mode;
     currentPage = 1;
-    
     document.getElementById('layout-1-col').classList.toggle('active', mode === 1);
     document.getElementById('layout-2-col').classList.toggle('active', mode === 2);
-    
     renderGrid();
 };
 
@@ -289,7 +242,6 @@ function renderGrid() {
     const pageVideos = filteredVideos.slice(start, end);
 
     if (pageVideos.length === 0) {
-        // EMPTY STATE DENGAN CONTAINER KHUSUS (TIDAK TERPENGARUH GRID CLASS)
         elVideoGrid.className = 'empty-state-container';
         elVideoGrid.innerHTML = `
             <div class="empty-state-box">
@@ -301,17 +253,23 @@ function renderGrid() {
         return;
     }
 
-    // Kembalikan ke format Grid Layout saat ada item video
     elVideoGrid.className = `video-grid layout-${layoutMode}`;
     const now = new Date();
 
     pageVideos.forEach(video => {
-        const uploadDate = new Date(video.uploadDate);
-        const expiryDate = new Date(uploadDate);
-        expiryDate.setDate(expiryDate.getDate() + 7);
+        // MENGHORMATI EXPIRY DATE ASLI DARI DATABASE JIKA ADA
+        let expiryDate;
+        if (video.expiryDate) {
+            expiryDate = new Date(video.expiryDate);
+        } else {
+            const uploadDate = new Date(video.uploadDate || now);
+            expiryDate = new Date(uploadDate);
+            expiryDate.setDate(expiryDate.getDate() + 7);
+        }
+
         const diffTime = expiryDate - now;
         const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        const isExpired = daysLeft <= 0;
+        const isExpired = diffTime <= 0;
 
         let badgeHtml = isExpired 
             ? `<div class="badge-expired danger">Expired! harap pakai link no password dulu</div>` 
@@ -336,7 +294,6 @@ function renderGrid() {
     renderPagination(Math.ceil(filteredVideos.length / itemsPerPage));
 }
 
-// --- CARD ACTIONS ---
 window.handlePasswordBtn = (id, isExpired, btnElement) => {
     if (isExpired) {
         btnElement.classList.remove('shake');
@@ -360,20 +317,16 @@ window.handlePasswordBtn = (id, isExpired, btnElement) => {
     }
 };
 
-// --- VIDEO PASSWORD LOGIC (PER-VIDEO VALIDATION) ---
 function verifyVideoPassword() {
     const btn = document.getElementById('btn-verify-video');
     window.open('https://www.effectivegatecpm.com/z55w4h3qx2?key=b3e81a33d4a9ac5be6d499f5f1bd6274', '_blank');
     
     animateDots(btn, "Menyiapkan", 5, "Lanjut", () => {
         const input = document.getElementById('video-password').value;
-        
-        // Memastikan kecocokan langsung dengan `videoPassword` spesifik milik video target
         if (input === selectedVideo.videoPassword) {
             window.open(selectedVideo.passwordLink, '_blank');
             closeVideoPopup();
         } else {
-            // Memberikan feedback error jika password salah tanpa menutup popup
             btn.classList.remove('shake');
             void btn.offsetWidth;
             btn.classList.add('shake');
@@ -389,19 +342,13 @@ window.closeVideoPopup = () => {
     elVideoPopup.classList.remove('active');
 };
 
-// --- DYNAMIC ISLAND LOGIC ---
 function showDynamicIsland(message = "Maaf Link Sudah Expired") {
     if (isIslandActive) return; 
     isIslandActive = true;
-    
     document.getElementById('island-text').innerText = message;
     elMainHeader.classList.add('header-dimmed');
     elIsland.classList.remove('island-hidden');
-    
-    setTimeout(() => {
-        elIsland.classList.add('island-expanded');
-    }, 50);
-
+    setTimeout(() => elIsland.classList.add('island-expanded'), 50);
     setTimeout(() => {
         elIsland.classList.remove('island-expanded');
         setTimeout(() => {
@@ -412,7 +359,6 @@ function showDynamicIsland(message = "Maaf Link Sudah Expired") {
     }, 3000);
 }
 
-// --- PAGINATION LOGIC ---
 function renderPagination(totalPages) {
     elPagination.innerHTML = '';
     if (totalPages <= 1) return;
