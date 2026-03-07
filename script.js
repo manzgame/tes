@@ -90,7 +90,11 @@ function applyUnlockedState(animate = false) {
 }
 
 function initializeAppState() {
-    const savedTheme = localStorage.getItem('theme') || 'dark';
+    let savedTheme = localStorage.getItem('theme');
+    if (!savedTheme) {
+        savedTheme = 'dark';
+        localStorage.setItem('theme', 'dark');
+    }
     document.documentElement.setAttribute('data-theme', savedTheme);
     document.getElementById('btn-verify-global').onclick = verifyGlobalPassword;
     document.getElementById('search-input').addEventListener('input', handleSearch);
