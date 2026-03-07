@@ -17,8 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!hasValidPublicAccess()) {
         elGlobalPopup.classList.add('active');
+        document.body.classList.add('no-scroll'); // PENCEGAHAN SCROLL
     } else if (!hasValidAdminAccess()) {
         elAdminPopup.classList.add('active');
+        document.body.classList.add('no-scroll'); // PENCEGAHAN SCROLL
     } else {
         unlockAdminPanel();
     }
@@ -44,6 +46,7 @@ window.verifyGlobalGate = () => {
         
         if (!hasValidAdminAccess()) {
             elAdminPopup.classList.add('active');
+            // Biarkan body.no-scroll tetap terkunci untuk form selanjutnya
         } else {
             unlockAdminPanel();
         }
@@ -64,6 +67,7 @@ window.verifyAdminGate = () => {
 
 function unlockAdminPanel() {
     elAppWrapper.classList.remove('blurred');
+    document.body.classList.remove('no-scroll'); // BEBASKAN LAYAR SAAT TERBUKA
     loadAdminData();
     
     // Auto fill upload date create form
