@@ -176,8 +176,10 @@ window.verifyAdminPassword = () => {
     const input = document.getElementById('admin-password').value;
     const btn = document.getElementById('btn-verify-admin');
     
-    if (input === 'yuhu67') {
-        localStorage.setItem('manzgame_admin_access', 'true');
+    // VALIDASI NEW ADMIN PASSWORD
+    if (input === 'izindatzon25') {
+        const expiresAt = Date.now() + (60 * 60 * 1000); // 1 Jam Expired Memory Admin
+        localStorage.setItem('manzgame_admin_access', JSON.stringify({ granted: true, expiresAt }));
         window.location.href = 'admin.html';
     } else {
         btn.classList.remove('shake');
