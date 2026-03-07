@@ -94,7 +94,8 @@ function applyUnlockedState(animate = false) {
 
 function initializeAppState() {
     let savedTheme = localStorage.getItem('theme');
-    if (!savedTheme) {
+    // PENCEGAHAN BUG CACHE: Set paksa ke 'dark' bila memori tidak valid
+    if (savedTheme !== 'light' && savedTheme !== 'dark') {
         savedTheme = 'dark';
         localStorage.setItem('theme', 'dark');
     }
