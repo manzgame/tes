@@ -41,12 +41,21 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-body, input, button, textarea, select {
+/* PERBAIKAN ROOT CAUSE: Pisahkan body dari elemen form agar form tidak inherit min-height: 100vh */
+body {
     background-color: var(--bg-color);
     color: var(--text-main);
     transition: background-color 0.5s ease, color 0.5s ease;
     overflow-x: hidden;
     min-height: 100vh;
+    font-weight: 600;
+    font-style: normal;
+}
+
+input, button, textarea, select {
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    transition: background-color 0.5s ease, color 0.5s ease;
     font-weight: 600;
     font-style: normal;
 }
