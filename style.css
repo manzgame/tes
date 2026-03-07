@@ -64,6 +64,18 @@ input, button, textarea, select {
     font-style: normal;
 }
 
+/* HIDE NATIVE BROWSER PASSWORD REVEAL ICON TO PREVENT DUPLICATES */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none !important;
+}
+input[type="password"]::-webkit-contacts-auto-fill-button,
+input[type="password"]::-webkit-credentials-auto-fill-button {
+    visibility: hidden;
+    display: none !important;
+    pointer-events: none;
+}
+
 /* =========================================
    GLASS UTILITIES
 ========================================= */
@@ -263,8 +275,9 @@ header {
 
 .sidebar-title { font-size: 16px; font-weight: 800; letter-spacing: 2px; color: var(--text-sub); margin-bottom: 25px; padding-left: 10px;}
 
-/* FIX SIDEBAR SCROLL: min-height memaksa nav lebih tinggi dari viewport, sehingga footer terdorong ke bawah */
-.sidebar-nav { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 85vh; }
+/* FIX SIDEBAR SCROLL: Dibuat mengalir natural tanpa paksaan min-height */
+.sidebar-nav { display: flex; flex-direction: column; gap: 12px; }
+
 .sidebar-item {
     display: flex; align-items: center; gap: 15px; padding: 12px 15px;
     background: rgba(128,128,128,0.05); border-radius: 14px; border: 1px solid transparent;
@@ -273,7 +286,8 @@ header {
 .sidebar-item:hover { background: rgba(128,128,128,0.15); border-color: var(--glass-border); transform: translateX(5px); }
 .sidebar-item svg { width: 22px; height: 22px; color: var(--accent-blue); }
 
-.sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 15px; border-top: 1px solid var(--glass-border); padding-top: 20px; padding-bottom: 15px; }
+/* FOOTER DIRECTLY BELOW: Menghapus margin-top:auto agar menempel langsung di bawah item Navigasi */
+.sidebar-footer { display: flex; flex-direction: column; gap: 15px; border-top: 1px solid var(--glass-border); padding-top: 20px; padding-bottom: 15px; margin-top: 10px; }
 .total-videos { font-size: 14px; font-weight: 600; text-align: center; color: var(--text-main); background: rgba(128,128,128,0.1); padding: 10px; border-radius: 12px; }
 
 /* =========================================
