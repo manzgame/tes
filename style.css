@@ -256,14 +256,15 @@ header {
     z-index: 9990; border-radius: 0 24px 24px 0;
     display: flex; flex-direction: column; padding: 25px 20px;
     transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-    /* DITAMBAHKAN UNTUK MEMPERBAIKI ISSUE SIDEBAR SCROLL */
     overflow-y: auto; 
     overflow-x: hidden;
 }
 #sidebar.active { left: 0; }
 
 .sidebar-title { font-size: 16px; font-weight: 800; letter-spacing: 2px; color: var(--text-sub); margin-bottom: 25px; padding-left: 10px;}
-.sidebar-nav { display: flex; flex-direction: column; gap: 12px; flex: 1; }
+
+/* FIX SIDEBAR SCROLL: min-height memaksa nav lebih tinggi dari viewport, sehingga footer terdorong ke bawah */
+.sidebar-nav { display: flex; flex-direction: column; gap: 12px; flex: 1; min-height: 85vh; }
 .sidebar-item {
     display: flex; align-items: center; gap: 15px; padding: 12px 15px;
     background: rgba(128,128,128,0.05); border-radius: 14px; border: 1px solid transparent;
