@@ -11,7 +11,8 @@
     
     <script>
         let initTheme = localStorage.getItem('theme');
-        if (!initTheme) {
+        // PENCEGAHAN BUG CACHE: Set paksa ke 'dark' bila memori tidak valid
+        if (initTheme !== 'light' && initTheme !== 'dark') {
             initTheme = 'dark';
             localStorage.setItem('theme', 'dark');
         }
