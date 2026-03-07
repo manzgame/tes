@@ -41,7 +41,6 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-/* PERBAIKAN ROOT CAUSE: Pisahkan body dari elemen form agar form tidak inherit min-height: 100vh */
 body {
     background-color: var(--bg-color);
     color: var(--text-main);
@@ -50,6 +49,11 @@ body {
     min-height: 100vh;
     font-weight: 600;
     font-style: normal;
+}
+
+/* SCROLL LOCK UTILITY UNTUK POPUP & SIDEBAR */
+body.no-scroll {
+    overflow: hidden !important;
 }
 
 input, button, textarea, select {
@@ -252,6 +256,9 @@ header {
     z-index: 9990; border-radius: 0 24px 24px 0;
     display: flex; flex-direction: column; padding: 25px 20px;
     transition: left 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+    /* DITAMBAHKAN UNTUK MEMPERBAIKI ISSUE SIDEBAR SCROLL */
+    overflow-y: auto; 
+    overflow-x: hidden;
 }
 #sidebar.active { left: 0; }
 
@@ -265,7 +272,7 @@ header {
 .sidebar-item:hover { background: rgba(128,128,128,0.15); border-color: var(--glass-border); transform: translateX(5px); }
 .sidebar-item svg { width: 22px; height: 22px; color: var(--accent-blue); }
 
-.sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 15px; border-top: 1px solid var(--glass-border); padding-top: 20px; }
+.sidebar-footer { margin-top: auto; display: flex; flex-direction: column; gap: 15px; border-top: 1px solid var(--glass-border); padding-top: 20px; padding-bottom: 15px; }
 .total-videos { font-size: 14px; font-weight: 600; text-align: center; color: var(--text-main); background: rgba(128,128,128,0.1); padding: 10px; border-radius: 12px; }
 
 /* =========================================
