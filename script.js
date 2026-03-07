@@ -156,13 +156,11 @@ window.closeAdminPopup = () => {
     document.getElementById('admin-popup').classList.remove('active');
 };
 
-// TERKONEKSI KE ADMIN PANEL
 window.verifyAdminPassword = () => {
     const input = document.getElementById('admin-password').value;
     const btn = document.getElementById('btn-verify-admin');
     
     if (input === 'yuhu67') {
-        // Beri tiket akses admin khusus dan pindah halaman
         localStorage.setItem('manzgame_admin_access', 'true');
         window.location.href = 'admin.html';
     } else {
@@ -257,23 +255,33 @@ function renderGrid() {
     const now = new Date();
 
     pageVideos.forEach(video => {
-        // MENGHORMATI EXPIRY DATE ASLI DARI DATABASE JIKA ADA
-        let expiryDate;
+        // PERBAIKAN LOGIKA EXPIRY: Anti-NaN Fail-Safe
+        let expiryDate = null;
         if (video.expiryDate) {
             expiryDate = new Date(video.expiryDate);
-        } else {
-            const uploadDate = new Date(video.uploadDate || now);
+        }
+        
+        // Fallback jika expiryDate tidak valid/kosong
+        if (!expiryDate || isNaN(expiryDate.getTime())) {
+            const uploadDate = video.uploadDate ? new Date(video.uploadDate) : now;
             expiryDate = new Date(uploadDate);
+            if(isNaN(expiryDate.getTime())) expiryDate = new Date(now); // Deep safety
             expiryDate.setDate(expiryDate.getDate() + 7);
         }
 
-        const diffTime = expiryDate - now;
+        const diffTime = expiryDate.getTime() - now.getTime();
         const daysLeft = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
         const isExpired = diffTime <= 0;
 
-        let badgeHtml = isExpired 
-            ? `<div class="badge-expired danger">Expired! harap pakai link no password dulu</div>` 
-            : `<div class="badge-expired">Expired ${daysLeft} hari lagi...</div>`;
+        let badgeHtml = '';
+        if (isExpired) {
+            badgeHtml = `<div class="badge-expired danger">Expired! harap pakai link no password dulu</div>`;
+        } else if (isNaN(daysLeft)) {
+            // Jika suatu saat sistem anomali, tidak keluar kata NaN
+            badgeHtml = `<div class="badge-expired danger">Link Tersedia</div>`;
+        } else {
+            badgeHtml = `<div class="badge-expired">Expired ${daysLeft} hari lagi...</div>`;
+        }
 
         const card = document.createElement('div');
         card.className = 'card glass-panel';
