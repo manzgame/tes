@@ -1,9 +1,9 @@
 import { getVideos } from './firebase.js';
 
 window.SOCIAL_LINKS = {
-    youtube: "https://youtube.com/@contoh",
-    whatsapp: "https://whatsapp.com/channel/contoh",
-    telegram: "https://t.me/contoh"
+    youtube: "https://youtube.com/@gamemanz?si=WbRP4AABGRlj2CdH",
+    whatsapp: "https://whatsapp.com/channel/0029VbBVWQ34tRrvFx2smT0P",
+    telegram: "https://t.me/manzbackup"
 };
 
 let allVideos = [];
