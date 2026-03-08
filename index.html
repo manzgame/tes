@@ -54,29 +54,13 @@
         </nav>
         <div class="sidebar-footer">
             <div class="total-videos">Total Video: <span id="total-video-count">0</span></div>
-            <button class="glass-btn btn-outline" style="width: 100%;" onclick="openAdminPopup()">
+            <!-- REDIRECT LANGSUNG KE ADMIN.HTML -->
+            <button class="glass-btn btn-outline" style="width: 100%;" onclick="window.location.href='admin.html'">
                 <svg style="margin-right: 8px; width:18px; height:18px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
                 Akses Admin Khusus
             </button>
         </div>
     </aside>
-
-    <!-- ADMIN PASSWORD POPUP -->
-    <div id="admin-popup" class="popup-overlay">
-        <div class="popup-box glass-panel">
-            <h2 class="popup-title">AKSES ADMIN</h2>
-            <div class="input-group">
-                <input type="password" id="admin-password" placeholder="Password Admin">
-                <button class="toggle-eye" onclick="togglePassword('admin-password', this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-            </div>
-            <div class="popup-actions" style="margin-top: 20px;">
-                <button id="btn-verify-admin" class="glass-btn btn-blue" onclick="verifyAdminPassword()">Masuk</button>
-            </div>
-            <button class="close-popup" onclick="closeAdminPopup()">Batal</button>
-        </div>
-    </div>
 
     <!-- GLOBAL PASSWORD POPUP -->
     <div id="global-popup" class="popup-overlay">
