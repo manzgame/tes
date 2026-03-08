@@ -62,6 +62,7 @@ function clearStoredAccess() {
 
 function setStoredAccess() {
     const expiresAt = Date.now() + ACCESS_DURATION;
+    // Menggunakan localStorage object dengan kedaluwarsa 1 jam (Sesuai Permintaan)
     localStorage.setItem(ACCESS_KEY, JSON.stringify({ granted: true, expiresAt }));
 }
 
@@ -161,40 +162,12 @@ window.navHome = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
 };
 
-window.openAdminPopup = () => {
-    window.toggleSidebar(); // Menutup sidebar otomatis yang meniadakan no-scroll
-    document.getElementById('admin-password').value = '';
-    document.getElementById('admin-popup').classList.add('active');
-    document.body.classList.add('no-scroll'); // Pasang kembali no-scroll untuk popup admin
-};
-
-window.closeAdminPopup = () => {
-    document.getElementById('admin-popup').classList.remove('active');
-    document.body.classList.remove('no-scroll'); // Membebaskan scroll layar
-};
-
-window.verifyAdminPassword = () => {
-    const input = document.getElementById('admin-password').value;
-    const btn = document.getElementById('btn-verify-admin');
-    
-    // VALIDASI NEW ADMIN PASSWORD
-    if (input === 'izindatzon25') {
-        const expiresAt = Date.now() + (60 * 60 * 1000); // 1 Jam Expired Memory Admin
-        localStorage.setItem('manzgame_admin_access', JSON.stringify({ granted: true, expiresAt }));
-        window.location.href = 'admin.html';
-    } else {
-        btn.classList.remove('shake');
-        void btn.offsetWidth; 
-        btn.classList.add('shake');
-        showDynamicIsland("Maaf Password Salah");
-    }
-};
-
 function verifyGlobalPassword() {
     const input = document.getElementById('global-password').value;
     const btn = document.getElementById('btn-verify-global');
 
-    if (input !== 'qwert67') {
+    // MENGUBAH PASSWORD STARTUP PUBLIK DARI qwert67 MENJADI MILK
+    if (input !== 'MILK') {
         showDynamicIsland("PASSWORD SALAH!");
         return;
     }
