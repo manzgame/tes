@@ -3,10 +3,9 @@ import { getAllVideosForAdmin, saveVideo, deleteVideo } from './firebase.js';
 let allVideosAdmin = [];
 
 const elAppWrapper = document.getElementById('app-wrapper');
-const elGlobalPopup = document.getElementById('global-popup');
 const elAdminPopup = document.getElementById('admin-popup');
 
-// Cek Keamanan Berjenjang (Publik -> Admin)
+// Cek Keamanan Admin Berjalan Independen
 document.addEventListener('DOMContentLoaded', () => {
     let savedTheme = localStorage.getItem('theme');
     // PENCEGAHAN BUG CACHE: Set paksa ke 'dark' bila memori tidak valid
@@ -16,11 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     document.documentElement.setAttribute('data-theme', savedTheme);
 
-    // Menerapkan update keamanan berlapis: publik & admin object-based
-    if (!hasValidPublicAccess()) {
-        elGlobalPopup.classList.add('active');
-        document.body.classList.add('no-scroll'); 
-    } else if (!hasValidAdminAccess()) {
+    // Murni mengecek akses Admin saja. Akses publik dihapus untuk admin.html.
+    if (!hasValidAdminAccess()) {
         elAdminPopup.classList.add('active');
         document.body.classList.add('no-scroll'); 
     } else {
@@ -33,43 +29,23 @@ document.getElementById('v-thumbnail').addEventListener('input', (e) => {
     updatePreview(e.target.value);
 });
 
-function hasValidPublicAccess() {
-    try {
-        const access = JSON.parse(localStorage.getItem('manzgame_access'));
-        if (access && Date.now() < access.expiresAt) return true;
-    } catch(e) {}
-    return false;
-}
-
 function hasValidAdminAccess() {
     try {
         const accessStr = localStorage.getItem('manzgame_admin_access');
         if (!accessStr) return false;
         const access = JSON.parse(accessStr);
-        // Proteksi jika dulunya masih tersimpan sebagai "true" string
+        // Proteksi Expiration 1 Jam
         if (access && access.granted && Date.now() < access.expiresAt) return true;
     } catch(e) {}
+    
+    // Bersihkan sisa token apabila kedaluwarsa
+    localStorage.removeItem('manzgame_admin_access');
     return false;
-}
-
-window.verifyGlobalGate = () => {
-    if (document.getElementById('global-password').value === 'qwert67') {
-        const expiresAt = Date.now() + (60 * 60 * 1000);
-        localStorage.setItem('manzgame_access', JSON.stringify({ granted: true, expiresAt }));
-        elGlobalPopup.classList.remove('active');
-        
-        if (!hasValidAdminAccess()) {
-            elAdminPopup.classList.add('active');
-        } else {
-            unlockAdminPanel();
-        }
-    } else {
-        alert("Password Publik Salah");
-    }
 }
 
 window.verifyAdminGate = () => {
     const btn = document.getElementById('btn-verify-admin');
+    // MENGUNCI DENGAN PASSWORD ADMIN TERBARU
     if (document.getElementById('admin-password').value === 'izindatzon25') {
         const expiresAt = Date.now() + (60 * 60 * 1000); // Expiration memori admin 1 Jam
         localStorage.setItem('manzgame_admin_access', JSON.stringify({ granted: true, expiresAt }));
