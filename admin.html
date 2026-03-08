@@ -24,24 +24,7 @@
 </head>
 <body>
 
-    <!-- GLOBAL PASSWORD POPUP (Gate 1 Admin) -->
-    <div id="global-popup" class="popup-overlay">
-        <div class="popup-box glass-panel">
-            <div class="popup-brand-row">
-                <span class="brand-text">MANZGAME ADMIN</span>
-            </div>
-            <h2 class="popup-title">AKSES PUBLIK</h2>
-            <div class="input-group">
-                <input type="password" id="global-password" placeholder="Password Publik">
-                <button class="toggle-eye" onclick="togglePassword('global-password', this)">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-                </button>
-            </div>
-            <button id="btn-verify-global" class="glass-btn btn-blue" onclick="verifyGlobalGate()">Verifikasi Publik</button>
-        </div>
-    </div>
-
-    <!-- ADMIN PASSWORD POPUP (Gate 2 Admin) -->
+    <!-- ADMIN PASSWORD POPUP (Hanya Gate 1 Khusus Admin, Gate Publik Dihapus) -->
     <div id="admin-popup" class="popup-overlay">
         <div class="popup-box glass-panel">
             <div class="popup-brand-row">
